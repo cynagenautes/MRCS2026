@@ -1,0 +1,35 @@
+{
+    "name": "texlive",
+    "image": "texlive/texlive:latest",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": "false",
+            "installOhMyZsh": "false",
+            "installOhMyZshConfig" : "false",
+            "upgradePackages": "false",
+            "username": "texlive",
+            "userUid": "1000",
+            "userGid": "1000"
+        },
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "mounts": [
+        {
+            "target": "${containerWorkspaceFolder}/build",
+            "type": "volume"
+        }
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "James-Yu.latex-workshop",
+                "mosapride.zenkaku",
+                "sohamkamani.code-eol",
+                "oderwat.indent-rainbow"
+            ]
+        }
+    },
+    "postStartCommand": "sudo chown -R texlive:texlive ${containerWorkspaceFolder}/build",
+    "containerUser": "texlive",
+    "remoteUser": "texlive"
+}
