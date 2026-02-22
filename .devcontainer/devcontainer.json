@@ -32,6 +32,6 @@
         }
     },
     "postStartCommand": "sudo chown -R texlive:texlive ${containerWorkspaceFolder}/build",
-    "containerUser": "texlive",
+    "containerUser": "root",
     "remoteUser": "texlive"
 }
