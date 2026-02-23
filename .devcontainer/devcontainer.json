@@ -23,6 +23,15 @@
         {
             "target": "${containerWorkspaceFolder}/build",
             "type": "volume"
+        },
+        // 以下 Claude Codeのためのバインドマウント
+        {   "source": "${localEnv:HOME}/.claude",
+            "target": "/home/texlive/.claude",
+            "type": "bind"
+        },
+        {   "source": "${localEnv:HOME}/.claude.json",
+            "target": "/home/texlive/.claude.json",
+            "type": "bind"
         }
     ],
     "customizations": {
