@@ -14,7 +14,8 @@
             "userGid": "1000"
         },
         "ghcr.io/devcontainers/features/git:1": {},
-        "ghcr.io/stu-bell/devcontainer-features/claude-code:0": {}
+        "ghcr.io/stu-bell/devcontainer-features/claude-code:0": {},
+        "ghcr.io/rails/devcontainer/features/bun": {}
     },
     "runArgs": [
         "--rm"
@@ -31,6 +32,10 @@
         },
         {   "source": "${localEnv:HOME}/.claude.json",
             "target": "/home/texlive/.claude.json",
+            "type": "bind"
+        },
+        {   "source": "${localEnv:HOME}/.config/ccstatusline",
+            "target": "/home/texlive/.config/ccstatusline",
             "type": "bind"
         }
     ],
