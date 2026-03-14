@@ -1,5 +1,5 @@
 {
-    "name": "texlive",
+    "name": "LaTeX (TeX Live)",
     "build": {
     "dockerfile": "Dockerfile"
     },
