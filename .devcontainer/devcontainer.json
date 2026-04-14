@@ -15,7 +15,8 @@
         },
         "ghcr.io/devcontainers/features/git:1": {},
         "ghcr.io/stu-bell/devcontainer-features/claude-code:0": {},
-        "ghcr.io/rails/devcontainer/features/bun": {}
+        "ghcr.io/rails/devcontainer/features/bun": {},
+        "ghcr.io/jsburckhardt/devcontainer-features/codex:1": {}
     },
     "runArgs": [
         "--rm"
@@ -34,10 +35,16 @@
             "target": "/home/texlive/.claude.json",
             "type": "bind"
         },
+        // OpenAI Codexのためのバインドマウント
+        {   "source": "${localEnv:HOME}/.codex/",
+            "target": "/home/texlive/.codex/",
+            "type": "bind"
+        },
         {   "source": "${localEnv:HOME}/.config/ccstatusline",
             "target": "/home/texlive/.config/ccstatusline",
             "type": "bind"
         }
+
     ],
     "customizations": {
         "vscode": {
