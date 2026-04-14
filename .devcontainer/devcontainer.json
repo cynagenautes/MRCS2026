@@ -13,6 +13,8 @@
             "userUid": "1000",
             "userGid": "1000"
         },
+        // MCPサーバーのためにnpxが必要
+        "ghcr.io/devcontainers/features/node:1": {},
         "ghcr.io/devcontainers/features/git:1": {},
         "ghcr.io/stu-bell/devcontainer-features/claude-code:0": {},
         "ghcr.io/rails/devcontainer/features/bun": {},
