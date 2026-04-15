@@ -1,3 +1,11 @@
+# Claude Code Local Settings
+.claude/settings.local.json
+.claude/hooks/local/
+.claude/commands/local/
+.claude/logs/
+.claude/*.log
+.claude/audit-*.log
+
 ## Custom setting for this template
 dist/
 
