@@ -5,6 +5,28 @@
 \documentclass[runningheads]{llncs}
 %
 \usepackage{url}
+\usepackage{marvosym}
+
+\usepackage[printonlyused,withpage]{acronym}
+\newacro{ViT}[ViT]{Vision Transformer}
+\newacro{MHSA}[MHSA]{Multi-Head Self-Attention}
+\newacro{LoRA}[LoRA]{Low-Rank Adaptation}
+\newacro{QLoRA}[QLoRA]{Quantized Low-Rank Adaptation}
+\newacro{CV}[CV]{computer vision}
+\newacro{SOTA}[SOTA]{state-of-the-art}
+\newacro{PEFT}[PEFT]{parameter-efficient fine-tuning}
+\newacro{CNN}[CNN]{convolutional neural network}
+\newacro{KD}[KD]{Knowledge Distillation}
+\newacro{LLM}[LLM]{Large Language Model}
+\newacro{NLP}[NLP]{natural language processing}
+\newacro{NF4}[NF4]{4-bit NormalFloat}
+\newacro{DQ}[DQ]{Double Quantization}
+\newacro{GELU}[GELU]{ Gaussian Error Linear Unit}
+\newacro{FP32}[FP32]{32-bit floating-point}
+\newacro{SVD}[SVD]{singular value decomposition}
+\newacro{PTQ}[PTQ]{post-training quantization}
+\newacro{QAT}[QAT]{quantization-aware training}
+
 \usepackage[T1]{fontenc}
 % T1 fonts will be used to generate the final print and online PDFs,
 % so please use T1 fonts in your manuscript whenever possible.
@@ -22,26 +44,22 @@
 %
 \begin{document}
 %
-\title{Contribution Title}
+\title{LoftQ: ViT(temp title)}
 %
 %\titlerunning{Abbreviated paper title}
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-\author{First Author\inst{1}\orcidID{0000-1111-2222-3333} \and
-Second Author\inst{2,3}\orcidID{1111-2222-3333-4444} \and
-Third Author\inst{3}\orcidID{2222--3333-4444-5555}}
+\author{Hikaru Fukusaka\inst{1}\and
+Lin Meng\inst{2}$^{(\textrm{\Letter})}$}
 %
-\authorrunning{F. Author et al.}
+\authorrunning{H. Fukusaka et al.}
 % First names are abbreviated in the running head.
 % If there are more than two authors, 'et al.' is used.
 %
-\institute{Princeton University, Princeton NJ 08544, USA \and
-Springer Heidelberg, Tiergartenstr. 17, 69121 Heidelberg, Germany
-\email{lncs@springer.com}\\
-\url{http://www.springer.com/gp/computer-science/lncs} \and
-ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
-\email{\{abc,lncs\}@uni-heidelberg.de}}
+\institute{Graduate School of Science and Engineering, Ritsumeikan University, Kusatsu 5250058, Japan\and
+College of Science and Engineering, Ritsumeikan University, Kusatsu 5250058, Japan\\
+\email{menglin@fc.ritsumei.ac.jp}}
 %
 \maketitle              % typeset the header of the contribution
 %
@@ -49,91 +67,71 @@ ABC Institute, Rupert-Karls-University Heidelberg, Heidelberg, Germany\\
 The abstract should briefly summarize the contents of the paper in
 150--250 words.
 
-\keywords{First keyword  \and Second keyword \and Another keyword.}
+\keywords{ViT  \and PEFT \and LoRA \and Quantization.}
 \end{abstract}
 %
 %
 %
-\section{First Section}
-\subsection{A Subsection Sample}
-Please note that the first paragraph of a section or subsection is
-not indented. The first paragraph that follows a table, figure,
-equation etc. does not need an indent, either.
+\section{Introduction}
 
-Subsequent paragraphs, however, are indented.
+\section{Related Work}
+\subsection{Parameter-Efficient Fine-Tuning}
+\ac{LoRA}~\cite{hu2022lora} freezes pre-trained weights and approximates updates $\Delta W \approx BA$ using low-rank matrices($r \ll d$).
+The update is scaled by $\alpha/r$ to balance gradient magnitudes and ensure training stability,
+drastically reducing trainable parameters while matching full fine-tuning performance.
 
-\subsubsection{Sample Heading (Third Level)} Only two levels of
-headings should be numbered. Lower level headings remain unnumbered;
-they are formatted as run-in headings.
+AdaLoRA~\cite{zhang2023adaptive} overcomes \ac{LoRA}'s fixed-rank limitation by dynamically allocating ranks based on gradient importance.
+It utilizes \ac{SVD} to prune negligible singular values and redistributes the freed ranks to weight matrices with larger gradient magnitudes, optimizing parameter efficiency without manual rank tuning.
 
-\paragraph{Sample Heading (Fourth Level)}
-The contribution should contain no more than four levels of
-headings. Table~\ref{tab1} gives a summary of all heading levels.
+%この章はちょっと微妙かも LoRA-FAの説明が若干違う
+Several variants further enhance efficiency:
+LoRA-FA employs a hybrid low-rank and full-rank structure to capture complex updates;
+DoRA decomposes updates into magnitude and direction, controlling weight norms to prevent performance degradation;
+and VeRA represents updates via vector outer products to minimize the parameter footprint.
 
-\begin{table}
-\caption{Table captions should be placed above the
-tables.}\label{tab1}
-\begin{tabular}{|l|l|l|}
-\hline
-Heading level &  Example & Font size and style\\
-\hline
-Title (centered) &  {\Large\bfseries Lecture Notes} & 14 point, bold\\
-1st-level heading &  {\large\bfseries 1 Introduction} & 12 point, bold\\
-2nd-level heading & {\bfseries 2.1 Printing Area} & 10 point, bold\\
-3rd-level heading & {\bfseries Run-in Heading in Bold.} Text follows & 10 point, bold\\
-4th-level heading & {\itshape Lowest Level Heading.} Text follows & 10 point, italic\\
-\hline
-\end{tabular}
-\end{table}
+In \ac{ViT}, \ac{PEFT} is specialized via VPT (Jia et al., 2022), which injects visual prompts; SSF (Lian et al., 2022),
+which fine-tunes spectral-spatial features; and AdaptFormer (Chen et al., 2022), which inserts bottleneck adapters into self-attention and FFN blocks.
+Standardized on the VTAB-1kbenchmark, these methods demonstrate that PEFT achieves full fine-tuning parity in vision tasks while mitigating catastrophic forgetting.
 
+\subsection{Quantization for LLMs and quantization-aware fine-tuning}
+\label{sec:rw:llm_quant}
+Weight-only post-training quantization is the dominant strategy for deploying large language models.
+GPTQ~\cite{frantar2023gptqaccurateposttrainingquantization} uses approximate second-order error compensation to bring Open Pre-trained Transformer(OPT)~\cite{zhang2022optopenpretrainedtransformer} and BigScience Large Open-science Open-access Multilingual (BLOOM) language model~\cite{NEURIPS2022_ce9e92e3} down to INT4 with minor perplexity loss,
 
-\noindent Displayed equations are centered and set on a separate
-line.
-\begin{equation}
-x + y = z
-\end{equation}
-Please try to avoid rasterized images for line-art diagrams and
-schemas. Whenever possible, use vector graphics instead (see
-Fig.
+\subsection{Quantization for Vision Transformers}
+\label{sec:rw:vit_quant}
+Quantization research tailored to ViTs has developed along two largely separate lines.
+The first targets \ac{PTQ} and focuses on the unusual activation distributions induced by transformer non-linearities.
+PTQ4ViT~\cite{10.1007/978-3-031-19775-8_12} observes that post-Softmax values are tightly concentrated near zero within $[0,1]$ while post-GELU activations are asymmetric,
+with an unbounded positive range and a narrow negative one, and proposes twin uniform quantization with a Hessian-guided metric to handle both cases.
+RepQ-ViT~\cite{Li_2023_ICCV} addresses post-LayerNorm activations with severe inter-channel variation and post-Softmax activations exhibiting power-law features by applying channel-wise and $\log\sqrt{2}$ quantizers during calibration,
+and then reparameterizing the scales into hardware-friendly layer-wise and $\log_2$ quantizers at inference.
+These methods push INT4 \ac{PTQ} to a usable accuracy range without modifying the backbone,
+but by construction they do not interact with downstream fine-tuning.
 
-\begin{theorem}
-This is a sample theorem. The run-in heading is set in bold, while
-the following text appears in italics. Definitions, lemmas,
-propositions, and corollaries are styled the same way.
-\end{theorem}
+A second line pursues low-bit \acp{ViT} through \ac{QAT}.
+Q-ViT~\cite{NEURIPS2022_deb921bf} identifies the information distortion of the quantized self-attention map as the principal bottleneck and restores it through an information rectification module that maximizes the entropy of quantized attention weights,
+combined with a distribution-guided distillation loss that aligns attention similarity with a full-precision teacher.
+Subsequent fully binarized variants such as BiViT~\cite{He_2023_ICCV} push this regime further.
+While these works show that aggressively low-bit \acp{ViT} are trainable,
+they require end-to-end re-optimization of the entire backbone and do not exploit the parameter-efficient adaptation paradigm that has become standard for vision transfer learning~\cite{10.1007/978-3-031-19827-4_41,NEURIPS2022_69e2f49a}.
+Across both lines, the patch embedding and the classification head are conventionally excluded from quantization, reflecting an empirical sense that the input projection is disproportionately fragile---an observation we revisit quantitatively in Section~\ref{sec:analysis}.
+None of these efforts examine whether a LoftQ-style coupling between weight quantization and LoRA initialization transfers to \acp{ViT} under sub-2-bit budgets.
+\section{Method}
+
+\section{Experiments}
+
+\section{Analysis}
+
+\section{Conclusion}
+
 %
 % the environments 'definition', 'lemma', 'proposition', 'corollary',
 % 'remark', and 'example' are defined in the LLNCS documentclass as well.
 %
-\begin{proof}
-Proofs, examples, and remarks have the initial word in italics,
-while the following text appears in normal font.
-\end{proof}
-For citations of references, we prefer the use of square brackets
-and consecutive numbers. Citations using labels or the author/year
-convention are also acceptable. The following bibliography provides
-a sample reference list with entries for journal
-articles~\cite{ref_article1}, an LNCS chapter~\cite{ref_lncs1}, a
-book~\cite{ref_book1}, proceedings without editors~\cite{ref_proc1},
-and a homepage~\cite{ref_url1}. Multiple citations are grouped
-\cite{ref_article1,ref_lncs1,ref_book1},
-\cite{ref_article1,ref_book1,ref_proc1,ref_url1}.
-
 \begin{credits}
-\subsubsection{\ackname} A bold run-in heading in small font size at the end of the paper is
-used for general acknowledgments, for example: This study was funded
-by X (grant number Y).
-
-\subsubsection{\discintname}
-It is now necessary to declare any competing interests or to specifically
-state that the authors have no competing interests. Please place the
-statement with a bold run-in heading in small font size beneath the
-(optional) acknowledgments\footnote{If EquinOCS, our proceedings submission
-system, is used, then the disclaimer can be provided directly in the system.},
-for example: The authors have no competing interests to declare that are
-relevant to the content of this article. Or: Author A has received research
-grants from Company W. Author B has received a speaker honorarium from
-Company X and owns stock in Company Y. Author C is a member of committee Z.\cite{miyazawa1934polano}
+\subsubsection{\ackname}
+This work was supported by JST SPRING, Grant Number JPMJSP2101.
 \end{credits}
 %
 % ---- Bibliography ----
