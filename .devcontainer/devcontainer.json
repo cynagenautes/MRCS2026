@@ -47,7 +47,9 @@
                 "James-Yu.latex-workshop",
                 "mosapride.zenkaku",
                 "sohamkamani.code-eol",
-                "oderwat.indent-rainbow"
+                "oderwat.indent-rainbow",
+                "shardulm94.trailing-spaces",
+                "Anthropic.claude-code"
             ]
         }
     },
