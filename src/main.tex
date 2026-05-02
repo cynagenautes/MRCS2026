@@ -17,7 +17,7 @@
 \newacro{PEFT}[PEFT]{parameter-efficient fine-tuning}
 \newacro{CNN}[CNN]{convolutional neural network}
 \newacro{KD}[KD]{Knowledge Distillation}
-\newacro{LLM}[LLM]{Large Language Model}
+\newacro{LLM}[LLM]{large language model}
 \newacro{NLP}[NLP]{natural language processing}
 \newacro{NF4}[NF4]{4-bit NormalFloat}
 \newacro{DQ}[DQ]{Double Quantization}
@@ -95,8 +95,16 @@ Standardized on the VTAB-1kbenchmark, these methods demonstrate that PEFT achiev
 
 \subsection{Quantization for LLMs and quantization-aware fine-tuning}
 \label{sec:rw:llm_quant}
-Weight-only post-training quantization is the dominant strategy for deploying large language models.
-GPTQ~\cite{frantar2023gptqaccurateposttrainingquantization} uses approximate second-order error compensation to bring Open Pre-trained Transformer(OPT)~\cite{zhang2022optopenpretrainedtransformer} and BigScience Large Open-science Open-access Multilingual (BLOOM) language model~\cite{NEURIPS2022_ce9e92e3} down to INT4 with minor perplexity loss,
+Weight-only post-training quantization is the dominant strategy for deploying \acp{LLM}.
+GPTQ~\cite{frantar2023gptqaccurateposttrainingquantization} uses approximate second-order error compensation to bring OPT~\cite{zhang2022optopenpretrainedtransformer}
+and BLOOM~\cite{NEURIPS2022_ce9e92e3} down to INT4 with minor perplexity loss.
+AWQ~\cite{MLSYS2024_42a452cb} observes that weights are not equally important: protecting roughly $1\%$ of salient channels---identified by input-activation magnitude rather than weight magnitude---greatly reduces weight quantization error.
+It then applies a per-channel scaling that shrinks the relative quantization error of those channels while keeping the scheme weight-only.
+A complementary thread treats activation outliers as a structural obstacle to mixed weight--activation quantization:
+LLM.int8()~\cite{NEURIPS2022_c3ba4962} shows that emergent outlier features in large transformers break naive INT8 calibration,
+and SmoothQuant\cite{pmlr-v202-xiao23c} migrates magnitude between activations and weights so that both sides become quantizer-friendly.
+All of these methods are applied offline as post-training quantization to a frozen model,
+and are not designed to interact with downstream fine-tuning.
 
 \subsection{Quantization for Vision Transformers}
 \label{sec:rw:vit_quant}
